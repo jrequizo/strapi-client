@@ -23,14 +23,16 @@ export type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchem
         post: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
         patch: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
         delete: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-    }) => TOutput,
+    }) => Promise<TOutput>,
 }
 
-export type RouterRecord<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
+export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
     // [key: string]: CustomRouteParam<TInput, TOutputSchema, TOutput>
     [path: string]: RouterBaseFunction<TInput, TOutput>
 }
 
-export type AnyRouterRecord = RouterRecord<any, any, any>
+export type AnyModelRecord = {
+    [path: string]: RouterBaseFunction<any, any>
+}
 
 export type StrapiModelSchema<PropertyType> = { [x: string]: ZodSchema<PropertyType> };

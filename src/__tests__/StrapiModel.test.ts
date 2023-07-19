@@ -3,7 +3,6 @@ import { z } from "zod";
 import { StrapiModel } from "../index";
 
 import axios from "axios";
-import { CreateType } from "../types/types";
 
 describe('StrapiModel', () => {
     /**
@@ -46,17 +45,17 @@ describe('StrapiModel', () => {
     /**
      * 
      */
-    test('Create a StrapiModel with custom routes', () => {
+    test('Create a StrapiModel with custom routes', async () => {
         const model = new StrapiModel("restaurants", {
             id: z.number(),
             name: z.string()
         })
-        .createCustomRoute("addReview", {
+        .createCustomRoutes("addReview", {
             params: z.object({
                 name: z.string()
             }),
             response: z.object({
-                name: z.string(),
+                success: z.boolean()
             }),
             async handler({ input, post }) {
                 // input: the values being provided to the API
@@ -64,11 +63,17 @@ describe('StrapiModel', () => {
                 // client: the AxiosInstance initialised by the StrapiClient
                 const response = await post({ data: input });
 
-                return response.data;
+                return {
+                    success: response.status === 200
+                };
             },
         });
 
+        // const addReview = model.routes.addReview(axios.create())
+        const addReview = model.routes.addReview(axios.create());
 
-        
+        const result = await addReview({
+            name: "John Smith"
+        });
     });
 });

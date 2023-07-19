@@ -32,8 +32,6 @@ class RouterFactory<CurrentRouterRecord extends AnyRouterRecord> {
 
         this.routes = routes as NewRouterRecord & CurrentRouterRecord;
         
-        
-
         return this as any;
     }
 }

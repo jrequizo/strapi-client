@@ -3,15 +3,16 @@ import { z, ZodSchema } from "zod";
 import { createDefaultMethods } from "./createDefaultMethods";
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 
-import { AnyRouterRecord, CustomRouteParam, RouterRecord, StrapiModelSchema } from "../types/model";
+import { AnyModelRecord, CustomRouteParam, ModelRecord, StrapiModelSchema } from "../types/model";
 
 
 class StrapiModel<
     PropertyType,
     InputZodSchema extends StrapiModelSchema<PropertyType>,
+    ThisRouterRecord extends AnyModelRecord,
     Schema extends { [key: string]: unknown } = {
         [K in keyof InputZodSchema]: z.infer<InputZodSchema[K]>
-    }
+    },
 > {
     /**
      * The url of the Collection to target.
@@ -26,7 +27,7 @@ class StrapiModel<
     /**
      * The bound routes to this collection and their corresponding client implementations.
      */
-    routes: AnyRouterRecord = {};
+    routes: ThisRouterRecord;
 
     /**
      * Check to avoid duplication of default routes
@@ -37,6 +38,7 @@ class StrapiModel<
     constructor(endpoint: string, schema: InputZodSchema) {
         this.endpoint = endpoint;
         this.schema = schema;
+        this.routes = {} as ThisRouterRecord;
     }
 
     /**
@@ -69,80 +71,56 @@ class StrapiModel<
      * Creates a custom route handler for the specified endpoint
      * @returns 
      */
-    createCustomRoute<
+    createCustomRoutes<
         TInput,
         TOutputSchema,
         TOutput extends TOutputSchema,
-        RouteParams extends CustomRouteParam<TInput, TOutputSchema, TOutput>,
-    >(path: string, params: RouteParams) {
-        const newCustomRoutes: AnyRouterRecord = {}
+        TPath,
+        TExecutable = (client: AxiosInstance) => ((input: TInput) => Promise<TOutput>),
+        NewRouterRecord extends ThisRouterRecord = { [K in keyof TPath]: TExecutable } & ThisRouterRecord,
+    >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
+        PropertyType,
+        InputZodSchema,
+        ThisRouterRecord & NewRouterRecord,
+        Schema
+    > {
+        if (Object.keys(this.routes).find(key => key === path)) {
+            throw Error("Duplicate keys");
+        }
 
-        if (!Object.keys(this.routes).find(key => key === path)) {
-            newCustomRoutes[path] = (client: AxiosInstance) => {
-                // Return the executable function
-                return async function callable(input: TInput) {
-                    const result = await params.handler({
-                        input,
-                        // Fill the endpoint field with the provided endpoint
-                        get: (config) => client.get(path, config),
-                        put: (data, config) => client.put(path, data, config),
-                        post: (data, config) => client.post(path, data, config),
-                        patch: (data, config) => client.patch(path, data, config),
-                        delete: (config) => client.delete(path, config),
-                        client,
-                    });
+        const executable = function(client: AxiosInstance) {
+            // Return the executable function
+            return async function callable(input: TInput) {
+                const result = await params.handler({
+                    input,
+                    // Fill the endpoint field with the provided endpoint
+                    get: (config) => client.get(path, config),
+                    put: (data, config) => client.put(path, data, config),
+                    post: (data, config) => client.post(path, data, config),
+                    patch: (data, config) => client.patch(path, data, config),
+                    delete: (config) => client.delete(path, config),
+                    client,
+                });
 
-                    if (params.response) {
-                        const isValidResult = params.response.safeParse(result);
+                if (params.response) {
+                    const isValidResult = params.response.safeParse(result);
 
-                        if (!isValidResult.success) {
-                            // TODO: proper validation error?
-                            throw Error("Validation Error");
-                        }
+                    if (!isValidResult.success) {
+                        // TODO: proper validation error?
+                        throw Error("Validation Error");
                     }
-
-                    return result as TOutput;
                 }
-            }
 
-            // const routes: RouterRecord = {
-            //     [params.path]: (client: AxiosInstance) => {
-            //         // Return the executable function
-            //         return async function callable(input: TInput) {
-            //             const result = await params.handler({
-            //                 input,
-            //                 // Fill the endpoint field with the provided endpoint
-            //                 get: (config) => client.get(params.path, config),
-            //                 put: (data, config) => client.put(params.path, data, config),
-            //                 post: (data, config) => client.post(params.path, data, config),
-            //                 patch: (data, config) => client.patch(params.path, data, config),
-            //                 delete: (config) => client.delete(params.path, config),
-            //                 client,
-            //             });
-
-            //             if (params.response) {
-            //                 const isValidResult = params.response.safeParse(result);
-
-            //                 if (!isValidResult.success) {
-            //                     // TODO: proper validation error?
-            //                     throw Error("Validation Error");
-            //                 }
-            //             }
-
-            //             return result as TOutput;
-            //         }
-            //     },
-
-            //     ...this.routes
-            // }
+                return result as TOutput;
+            } as TExecutable;
         }
 
         this.routes = {
-            ...newCustomRoutes,
+            [path]: executable,
             ...this.routes
         };
 
-        return newCustomRoutes;
+        return this as any;
     }
 
     /**
