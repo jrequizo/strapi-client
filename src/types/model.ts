@@ -9,7 +9,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export type RouterBaseFunction<TInput, TOutput> = (client: AxiosInstance) => RouterExecutableFunction<TInput, TOutput>;
 
-export type RouterExecutableFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
+export type RouterExecutableFunction<TInput, TOutput> = (params: TInput) => Promise<TOutput>;
 
 export type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
     params?: ZodSchema<TInput>,
@@ -23,9 +23,14 @@ export type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchem
         post: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
         patch: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
         delete: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-    }) => unknown,
+    }) => TOutput,
 }
 
 export type RouterRecord<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
-    [key: string]: CustomRouteParam<TInput, TOutputSchema, TOutput>
+    // [key: string]: CustomRouteParam<TInput, TOutputSchema, TOutput>
+    [path: string]: RouterBaseFunction<TInput, TOutput>
 }
+
+export type AnyRouterRecord = RouterRecord<any, any, any>
+
+export type StrapiModelSchema<PropertyType> = { [x: string]: ZodSchema<PropertyType> };

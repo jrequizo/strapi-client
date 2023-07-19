@@ -1,6 +1,35 @@
 import type { AxiosInstance } from "axios";
 
 
+/************************************************************************************
+ *                                    Strapi Types                                  *
+ *                    The basic properties all Strapi entities have.                *
+ ***********************************************************************************/
+
+type StrapiEntity = {
+    id: number,
+    createdAt: Date,
+    updatedAt: Date,
+
+    // Can be returned as null
+    // Can be omitted on `Create`
+    publishedAt?: Date | null,
+}
+
+
+type StrapiImage = {
+    url: string
+} & StrapiEntity
+
+
+
+type StrapiAuthResult = {
+    jwt: string,
+    user: MeraUser
+}
+
+type NonStrapi<T> = Omit<T, keyof StrapiEntity>;
+
 
 /************************************************************************************
  *                                 Helper Types                                     *
@@ -11,16 +40,29 @@ import type { AxiosInstance } from "axios";
  * Construct a type where every key is optional but at least one key must exist in the object.
  */
 type AtLeastOneOf<T> = Partial<T> & U<Required<T>>[keyof U<T>]
+type U<T> = { [K in keyof T]: Pick<T, K> }
 
-type NonStrapi<T> = Omit<T, keyof StrapiEntity>;
+type NonNullRequired<T> = Required<{
+    [P in keyof T]: NonNullable<T[P]>
+}>
+
+type Without<T, V, WithNevers = {
+    [K in keyof T]: Exclude<T[K], undefined> extends V ? never
+    : (T[K] extends Record<string, unknown> ? Without<T[K], V> : T[K])
+}> = Pick<WithNevers, {
+    [K in keyof WithNevers]: WithNevers[K] extends never ? never : K
+}[keyof WithNevers]>
 
 
 /**
  * 
  */
-
 type PopulateFields<T> = Partial<Omit<Pick<T, IdKeys<T> | IdKeysArray<T>>, "id">>
 
+
+type PopulateCondition<T, A = Omit<NonNullRequired<T>, keyof StrapiEntity>> = Partial<Without<{
+    [P in keyof A]: A[P] extends Array<infer U> ? (U extends StrapiEntity ? boolean : never) : (A[P] extends StrapiEntity ? boolean : never)
+}, undefined>> | "*"
 
 /**
  * 
@@ -79,14 +121,17 @@ type WhereFilterArray<T, U> = AtLeastOneOf<Partial<{
 } & WhereFilterCommon<U[]>>>
 
 
-type PopulateCondition<T, A = Omit<NonNullRequired<T>, keyof StrapiEntity>> = Partial<Without<{
-    [P in keyof A]: A[P] extends Array<infer U> ? (U extends StrapiEntity ? boolean : never) : (A[P] extends StrapiEntity ? boolean : never)
-}, undefined>> | "*"
-
-
 type UpdateParams<T, A = Omit<NonNullRequired<T>, keyof StrapiEntity | "user"> & { publishedAt: Date }> = AtLeastOneOf<Without<{
     [P in keyof A]: A[P] extends Array<infer U> ? (U extends StrapiEntity ? number[] : A[P]) : (A[P] extends StrapiEntity ? number : A[P])
 }, undefined>>
+
+type CreateTypeRequired<T> = Without<Omit<{
+    [P in keyof T]: null extends T[P] ? never : T[P] extends Array<infer U> ? U extends StrapiEntity ? never : number[] : T[P]
+}, keyof StrapiEntity | "user">, never>;
+
+type CreateTypeOptional<T> = Partial<Without<Omit<{
+    [P in keyof T]: null extends T[P] ? (T[P] extends Array<infer U> ? number[] : NonNullable<T[P]>) : never
+}, keyof StrapiEntity | "user">, never>>;
 
 
 /************************************************************************************
