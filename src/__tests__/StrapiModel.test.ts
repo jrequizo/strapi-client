@@ -2,6 +2,9 @@ import { z } from "zod";
 
 import { StrapiModel } from "../index";
 
+import axios from "axios";
+import { CreateType } from "../types/types";
+
 describe('StrapiModel', () => {
     /**
      * 
@@ -20,14 +23,23 @@ describe('StrapiModel', () => {
     /**
      * 
      */
-    test('Create a StrapiModel with default routes', () => {
+    test('Create a StrapiModel with default routes', async () => {
         const model = new StrapiModel("restaurants", {
             id: z.number(),
             name: z.string()
         })
-        .createDefaultRoutes()
+        .createDefaultRoutes();
 
-        
+        // const routes = model.createDefaultRoutes();
+
+        // const update = routes.update(axios.create());
+
+        // await update({
+        //     id: 123,
+        //     update: {
+        //         name: "new name"
+        //     }
+        // })
     });
 
 
@@ -55,6 +67,7 @@ describe('StrapiModel', () => {
                 return response.data;
             },
         });
+
 
         
     });

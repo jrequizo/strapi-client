@@ -1,12 +1,18 @@
-import { ZodSchema } from "zod";
+import { z, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
-import { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 
-import { CustomRouteParam, RouterRecord } from "../types/router";
+import { AnyRouterRecord, CustomRouteParam, RouterRecord, StrapiModelSchema } from "../types/model";
 
 
-class StrapiModel {
+class StrapiModel<
+    PropertyType,
+    InputZodSchema extends StrapiModelSchema<PropertyType>,
+    Schema extends { [key: string]: unknown } = {
+        [K in keyof InputZodSchema]: z.infer<InputZodSchema[K]>
+    }
+> {
     /**
      * The url of the Collection to target.
      */
@@ -20,7 +26,7 @@ class StrapiModel {
     /**
      * The bound routes to this collection and their corresponding client implementations.
      */
-    routes: RouterRecord<unknown, unknown, unknown> = {};
+    routes: AnyRouterRecord = {};
 
     /**
      * Check to avoid duplication of default routes
@@ -28,7 +34,7 @@ class StrapiModel {
      */
     _hasDefaultRoutes = false;
 
-    constructor(endpoint: string, schema: { [x: string]: ZodSchema }) {
+    constructor(endpoint: string, schema: InputZodSchema) {
         this.endpoint = endpoint;
         this.schema = schema;
     }
@@ -39,10 +45,18 @@ class StrapiModel {
      */
     createDefaultRoutes() {
         if (!this._hasDefaultRoutes) {
-            this.routes = {
-                ...createDefaultMethods<typeof this.schema>(this.endpoint),
+            const defaultRoutes = createDefaultMethods<Schema>(this.endpoint);
+
+            const newRoutes = {
+                create: defaultRoutes.createBase,
+                find: defaultRoutes.findBase,
+                findOne: defaultRoutes.findOneBase,
+                update: defaultRoutes.updateBase,
+                delete: defaultRoutes.deleteBase,
                 ...this.routes,
-            }
+            };
+
+            this.routes = newRoutes;
 
             this._hasDefaultRoutes = true;
         }
@@ -61,7 +75,7 @@ class StrapiModel {
         TOutput extends TOutputSchema,
         RouteParams extends CustomRouteParam<TInput, TOutputSchema, TOutput>,
     >(path: string, params: RouteParams) {
-        const newCustomRoutes: RouterRecord = {}
+        const newCustomRoutes: AnyRouterRecord = {}
 
         if (!Object.keys(this.routes).find(key => key === path)) {
             newCustomRoutes[path] = (client: AxiosInstance) => {
