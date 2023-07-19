@@ -12,7 +12,7 @@ import { parseOutput } from "../util/parseOutput";
  * @param params 
  * @returns 
  */
-export async function findOne<TInput, TOutput>(client: AxiosInstance, routerPath: string, params: TInput) {
+export async function findOne<TInput, TOutput>(client: AxiosInstance, routerPath: string, params?: TInput) {
     const response = await findCore(client, routerPath, params);
 
     if (response.status !== 200) {

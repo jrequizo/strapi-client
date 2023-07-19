@@ -16,12 +16,12 @@ import { AtLeastOneOf, CreateType, DeleteType, FindType, UpdateType } from "../t
  * The base function returns the executable crud function that calls the Strapi API.
  * Needs to be provided with an axios client instance to run with.
  */
-export const createDefaultMethods = <
-    TSchema extends { [x: string]: ZodSchema },
+export function createDefaultMethods<
+    TSchema,
     CreateSchema = TSchema,
     FindSchema = TSchema,
     UpdateSchema = TSchema,
->(routerPath: string) => {
+>(routerPath: string) {
     // Define these out here so we can allow the user to define a type that is passed into the following transformers
     type CreateInput = CreateType<CreateSchema>;
     type FindInput = FindType<FindSchema>;
@@ -29,7 +29,7 @@ export const createDefaultMethods = <
 
     return {
         createBase(client: AxiosInstance) {
-            return async (params?: AtLeastOneOf<CreateInput>) => {
+            return async (params?: CreateInput) => {
                 return await create<CreateInput, TSchema>(client, routerPath, params);
             }
         },
@@ -47,7 +47,7 @@ export const createDefaultMethods = <
         },
 
         updateBase(client: AxiosInstance) {
-            return async (params: AtLeastOneOf<UpdateInput>) => {
+            return async (params: UpdateInput) => {
                 return await update<UpdateSchema, UpdateInput, TSchema>(client, routerPath, params);
             }
         },

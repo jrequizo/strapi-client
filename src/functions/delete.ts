@@ -2,6 +2,8 @@ import { AxiosInstance } from "axios";
 
 import { parseOutput } from "../util/parseOutput";
 
+import { DeleteType } from "../types/types";
+
 
 /**
  * 
@@ -10,7 +12,7 @@ import { parseOutput } from "../util/parseOutput";
  * @param params 
  * @returns 
  */
-export async function remove<TOutput>(client: AxiosInstance, routerPath: string, params: any) {
+export async function remove<TOutput>(client: AxiosInstance, routerPath: string, params: DeleteType) {
     const path = encodeURIComponent(`${routerPath}`);
 
     const url = new URL(`${client.defaults.baseURL}/${path}/${params.id}`);
