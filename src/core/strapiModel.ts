@@ -1,9 +1,10 @@
 import { z, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
+import { AxiosInstance, AxiosResponse } from "axios";
 
-import { AnyModelRecord, CustomRouteParam, ModelRecord, StrapiModelSchema } from "../types/model";
+import { AnyModelRecord, CustomRouteParam, StrapiModelSchema } from "../types/model";
+import { AtLeastOneOf, CreateType, DeleteType, FindType, UpdateType } from "../types/types";
 
 
 class StrapiModel<
@@ -45,7 +46,18 @@ class StrapiModel<
      * Create the default CRUD bindings present in Strapi for this model.
      * @returns `this` The current StrapiModel instance.
      */
-    createDefaultRoutes() {
+    createDefaultRoutes(): StrapiModel<
+        PropertyType,
+        InputZodSchema,
+        ThisRouterRecord & {
+            create: (client: AxiosInstance) => (params?: CreateType<Schema> | undefined) => Promise<Schema | AxiosResponse<any, any>>,
+            find: (client: AxiosInstance) => (params?: AtLeastOneOf<FindType<Schema>> | undefined) => Promise<AxiosResponse<any, any> | Schema[]>,
+            findOne: (client: AxiosInstance) => (params?: AtLeastOneOf<FindType<Schema>> | undefined) => Promise<AxiosResponse<any, any> | Schema[]>,
+            update: (client: AxiosInstance) => (params: UpdateType<Schema>) => Promise<Schema | AxiosResponse<any, any>>,
+            delete: (client: AxiosInstance) => (params: DeleteType) => Promise<Schema | AxiosResponse<any, any>>
+        },
+        Schema
+    > {
         if (!this._hasDefaultRoutes) {
             const defaultRoutes = createDefaultMethods<Schema>(this.endpoint);
 
@@ -63,7 +75,7 @@ class StrapiModel<
             this._hasDefaultRoutes = true;
         }
 
-        return this;
+        return this as any;
     }
 
 
