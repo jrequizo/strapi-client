@@ -2,6 +2,8 @@ import { AxiosInstance } from "axios";
 
 import { parseOutput } from "../util/parseOutput";
 
+import { UpdateType } from "../types/types";
+
 
 /**
  * 
@@ -10,7 +12,7 @@ import { parseOutput } from "../util/parseOutput";
  * @param params 
  * @returns 
  */
-export async function update<TOutput>(client: AxiosInstance, routerPath: string, params: any) {
+export async function update<TUpdateSchema, TInput extends UpdateType<TUpdateSchema>, TOutput>(client: AxiosInstance, routerPath: string, params: TInput) {
     const path = encodeURIComponent(`${routerPath}`);
 
     const url = new URL(`${client.defaults.baseURL}/${path}/${params.id}`);

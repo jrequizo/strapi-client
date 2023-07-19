@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-import StrapiModel from "./strapiModel";
+import StrapiModel from "./StrapiModel";
 
 class StrapiClient {
     client: AxiosInstance;

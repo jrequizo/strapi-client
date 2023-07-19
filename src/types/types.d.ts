@@ -1,4 +1,4 @@
-import { AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
 
 
 
@@ -13,38 +13,6 @@ import { AxiosInstance } from "axios";
 type AtLeastOneOf<T> = Partial<T> & U<Required<T>>[keyof U<T>]
 
 type NonStrapi<T> = Omit<T, keyof StrapiEntity>;
-
-
-/**
- * 
- */
-
-type RouterBaseFunction<TInput, TOutput> = (client: AxiosInstance) => RouterExecutableFunction<TInput, TOutput>;
-
-type RouterExecutableFunction<TInput, TOutput> = (params: TInput) => Promise<TOutput>
-
-type RouterBaseFunction<TInput, TOutput> = (client: AxiosInstance) => RouterExecutableFunction<TInput, TOutput>;
-
-type RouterExecutableFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
-
-type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
-    params?: ZodSchema<TInput>,
-    response?: ZodSchema<TOutputSchema>
-    handler: (props: {
-        client: AxiosInstance,
-        input: TInput,
-        // Prune the Http CRUD requests of the `url` parameter
-        get: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-        put: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        post: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        patch: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        delete: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-    }) => unknown,
-}
-
-type RouterRecord = {
-    [key: string]: RouterExecutable
-}
 
 
 /**

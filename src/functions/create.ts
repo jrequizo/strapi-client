@@ -11,7 +11,7 @@ import { parseOutput } from "../util/parseOutput";
  * @param params 
  * @returns 
  */
-export async function create<TInput, TOutput>(client: AxiosInstance, routerPath: string, params: any) {
+export async function create<TInput, TOutput>(client: AxiosInstance, routerPath: string, params: TInput) {
     const path = encodeURIComponent(`${routerPath}`);
 
     const url = new URL(`${client.defaults.baseURL}/${path}`);

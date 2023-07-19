@@ -3,7 +3,7 @@ import { ZodSchema } from "zod";
 import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 
-import { CustomRouteParam, RouterRecord } from "../types/types";
+import { CustomRouteParam, RouterRecord } from "../types/router";
 
 
 class StrapiModel {
@@ -20,7 +20,7 @@ class StrapiModel {
     /**
      * The bound routes to this collection and their corresponding client implementations.
      */
-    routes: RouterRecord = {};
+    routes: RouterRecord<unknown, unknown, unknown> = {};
 
     /**
      * Check to avoid duplication of default routes

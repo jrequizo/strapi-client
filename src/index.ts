@@ -1,5 +1,5 @@
-import StrapiClient from "./core/strapiClient";
-import StrapiModel from "./core/strapiModel";
+import StrapiClient from "./core/StrapiClient";
+import StrapiModel from "./core/StrapiModel";
 
 export {
     StrapiClient,
