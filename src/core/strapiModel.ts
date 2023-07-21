@@ -109,7 +109,7 @@ class StrapiModel<
         TOutputSchema,
         TOutput extends TOutputSchema,
         TInput = null,
-        TExecutable = (client: AxiosInstance) => ModelExecutableFunction<TOutput, TInput>,
+        TExecutable = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>,
     >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
         TEndpoint,
         InputZodSchema,

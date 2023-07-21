@@ -10,12 +10,12 @@ import StrapiModel from "../core/StrapiModel";
  * 
  */
 
-export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TOutput, TInput>;
+export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>;
 
-export type ModelExecutableFunction<TOutput, TInput> = TInput extends { [key: string]: unknown } ? (params: TInput) => Promise<TOutput> : () => Promise<TOutput>;
+export type ModelExecutableFunction<TInput, TOutput> = TInput extends { [key: string]: unknown } ? (params: TInput) => Promise<TOutput> : () => Promise<TOutput>;
 
 export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema, TPath> = {
-    [K in keyof TPath]: ModelWrapperFunction<TOutput, TInput>
+    [K in keyof TPath]: ModelWrapperFunction<TInput, TOutput>
 }
 
 export type AnyModelRecord = ModelRecord<any, any, any, any>
@@ -27,7 +27,7 @@ export type AnyStrapiModel = Omit<typeof StrapiModel<any, any, any>, "prototype"
 type ToObject<Model> = Model extends StrapiModel<infer Endpoint, infer TZodSchema, ModelRecord<any, any, any, infer TPath>>
     ? {
         [E in keyof Endpoint]: {
-            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TInput, infer TOutput> ? ModelExecutableFunction<TOutput, TInput> : never
+            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TInput, infer TOutput> ? ModelExecutableFunction<TInput, TOutput> : never
         }
     } : never;
 
