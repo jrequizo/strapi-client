@@ -1,11 +1,31 @@
 import { z, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
-import { AxiosInstance, AxiosResponse } from "axios";
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
-import { AnyModelRecord, CustomRouteParam, StrapiModelSchema } from "../types/model";
+import { AnyModelRecord, ModelExecutableFunction, StrapiModelSchema } from "../types/model";
 import { AtLeastOneOf } from "../types/core";
 import { CreateType, FindType, UpdateType, DeleteType } from "../types/crud";
+
+
+/**
+ * Defines the properties required for creating a custom rout in a `StrapiModel`.
+ * @internal
+ */
+type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
+    params?: ZodSchema<TInput>,
+    response?: ZodSchema<TOutputSchema>
+    handler: (props: {
+        client: AxiosInstance,
+        input: TInput,
+        // Prune the Http CRUD requests of the `url` parameter
+        get: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
+        put: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
+        post: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
+        patch: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
+        delete: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
+    }) => Promise<TOutput>,
+}
 
 
 class StrapiModel<
@@ -86,10 +106,10 @@ class StrapiModel<
      */
     createCustomRoutes<
         TPath,
-        TInput,
         TOutputSchema,
         TOutput extends TOutputSchema,
-        TExecutable = (client: AxiosInstance) => ((input: TInput) => Promise<TOutput>),
+        TInput = null,
+        TExecutable = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>,
     >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
         TEndpoint,
         InputZodSchema,

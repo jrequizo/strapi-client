@@ -1,6 +1,6 @@
 import { ZodSchema } from "zod";
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import type { AxiosInstance } from "axios";
 
 import StrapiModel from "../core/StrapiModel";
 
@@ -9,28 +9,13 @@ import StrapiModel from "../core/StrapiModel";
  * 
  */
 
-export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>;
+export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TOutput, TInput>;
 
-export type ModelExecutableFunction<TInput, TOutput> = (params: TInput) => Promise<TOutput>;
-
-export type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
-    params?: ZodSchema<TInput>,
-    response?: ZodSchema<TOutputSchema>
-    handler: (props: {
-        client: AxiosInstance,
-        input: TInput,
-        // Prune the Http CRUD requests of the `url` parameter
-        get: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-        put: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        post: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        patch: <T = any, R = AxiosResponse<T>, D = any>(data?: D, config?: AxiosRequestConfig<D>) => Promise<R>,
-        delete: <T = any, R = AxiosResponse<T>, D = any>(config?: AxiosRequestConfig<D>) => Promise<R>,
-    }) => Promise<TOutput>,
-}
+export type ModelExecutableFunction<TOutput, TInput = void> = TInput extends null ? () => Promise<TOutput> : (params: TInput) => Promise<TOutput>;
 
 export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema, TPath> = {
     // [key: string]: CustomRouteParam<TInput, TOutputSchema, TOutput>
-    [K in keyof TPath]: ModelWrapperFunction<TInput, TOutput>
+    [K in keyof TPath]: ModelWrapperFunction<TOutput, TInput>
 }
 
 export type AnyModelRecord = ModelRecord<any, any, any, any>
@@ -42,7 +27,7 @@ export type AnyStrapiModel = Omit<typeof StrapiModel<any, any, any>, "prototype"
 type ToObject<Model> = Model extends StrapiModel<infer Endpoint, infer TZodSchema, ModelRecord<any, any, any, infer TPath>>
     ? {
         [E in keyof Endpoint]: {
-            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TInput, infer TOutput> ? ModelExecutableFunction<TInput, TOutput> : never
+            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TOutput, infer TInput> ? ModelExecutableFunction<TOutput, TInput> : never
         }
     } : never;
 

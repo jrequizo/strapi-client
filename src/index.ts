@@ -76,6 +76,12 @@ const restaurantsModel = new StrapiModel("restaurants", {
 const reviewsModel = new StrapiModel("reviews", {
     id: z.number(),
     rating: z.number()
+}).createCustomRoutes("addReview", {
+    async handler() {
+        return {
+            hello: "world!"
+        }
+    },
 });
 
 const client = new StrapiClient({
@@ -83,4 +89,10 @@ const client = new StrapiClient({
     models: [restaurantsModel, reviewsModel]
 });
 
-console.log(client);
+async function run() {
+    const result = await client.api.reviews.addReview();
+
+    console.log(result);
+}
+
+run();
