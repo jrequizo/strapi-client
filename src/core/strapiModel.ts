@@ -4,12 +4,11 @@ import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosResponse } from "axios";
 
 import { AnyModelRecord, CustomRouteParam, StrapiModelSchema } from "../types/model";
-import { AtLeastOneOf, CreateType, DeleteType, FindType, UpdateType } from "../types/types";
 
 
 class StrapiModel<
-    PropertyType,
-    InputZodSchema extends StrapiModelSchema<PropertyType>,
+    TEndpoint,
+    InputZodSchema extends StrapiModelSchema<any>,
     ThisRouterRecord extends AnyModelRecord,
     Schema extends { [key: string]: unknown } = {
         [K in keyof InputZodSchema]: z.infer<InputZodSchema[K]>
@@ -18,7 +17,7 @@ class StrapiModel<
     /**
      * The url of the Collection to target.
      */
-    endpoint: string;
+    endpoint: string & keyof TEndpoint;
 
     /**
      * The properties of the Collection
@@ -36,7 +35,7 @@ class StrapiModel<
      */
     _hasDefaultRoutes = false;
 
-    constructor(endpoint: string, schema: InputZodSchema) {
+    constructor(endpoint: string & keyof TEndpoint, schema: InputZodSchema) {
         this.endpoint = endpoint;
         this.schema = schema;
         this.routes = {} as ThisRouterRecord;
@@ -47,7 +46,7 @@ class StrapiModel<
      * @returns `this` The current StrapiModel instance.
      */
     createDefaultRoutes(): StrapiModel<
-        PropertyType,
+        TEndpoint,
         InputZodSchema,
         ThisRouterRecord & {
             create: (client: AxiosInstance) => (params?: CreateType<Schema> | undefined) => Promise<Schema | AxiosResponse<any, any>>,
@@ -84,23 +83,22 @@ class StrapiModel<
      * @returns 
      */
     createCustomRoutes<
+        TPath,
         TInput,
         TOutputSchema,
         TOutput extends TOutputSchema,
-        TPath,
         TExecutable = (client: AxiosInstance) => ((input: TInput) => Promise<TOutput>),
-        NewRouterRecord extends ThisRouterRecord = { [K in keyof TPath]: TExecutable } & ThisRouterRecord,
     >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
-        PropertyType,
+        TEndpoint,
         InputZodSchema,
-        ThisRouterRecord & NewRouterRecord,
+        ThisRouterRecord & { [K in keyof TPath]: TExecutable },
         Schema
     > {
         if (Object.keys(this.routes).find(key => key === path)) {
             throw Error("Duplicate keys");
         }
 
-        const executable = function(client: AxiosInstance) {
+        const executable = function (client: AxiosInstance) {
             // Return the executable function
             return async function callable(input: TInput) {
                 const result = await params.handler({
@@ -134,14 +132,6 @@ class StrapiModel<
 
         return this as any;
     }
-
-    /**
-     * @internal
-     */
-    _addToRoute(route: any) {
-
-    }
-
 }
 
 export default StrapiModel;

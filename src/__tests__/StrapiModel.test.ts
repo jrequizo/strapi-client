@@ -49,9 +49,6 @@ describe('StrapiModel', () => {
             params: z.object({
                 name: z.string()
             }),
-            response: z.object({
-                success: z.boolean()
-            }),
             async handler({ input, post }) {
                 // input: the values being provided to the API
                 // output: the response from this function
@@ -64,7 +61,6 @@ describe('StrapiModel', () => {
             },
         });
 
-        // const addReview = model.routes.addReview(axios.create())
         const addReview = model.routes.addReview(axios.create());
 
         const result = await addReview({

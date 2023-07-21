@@ -2,6 +2,8 @@ import { ZodSchema } from "zod";
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
+import StrapiModel from "../core/StrapiModel";
+
 
 /**
  * 
@@ -31,8 +33,22 @@ export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema> = 
     [path: string]: RouterBaseFunction<TInput, TOutput>
 }
 
-export type AnyModelRecord = {
-    [path: string]: RouterBaseFunction<any, any>
-}
+export type AnyModelRecord = ModelRecord<any, any, any>
 
 export type StrapiModelSchema<PropertyType> = { [x: string]: ZodSchema<PropertyType> };
+
+export type AnyStrapiModel = Omit<typeof StrapiModel<any, any, any>, "prototype">;
+
+type ToObject<Model> = Model extends StrapiModel<infer Endpoint, infer Schema, infer RouterRecord>
+    ? { [P in keyof Endpoint]: RouterRecord } : never;
+
+type ToObjectsArray<T> = {
+    [I in keyof T]: ToObject<T[I]>
+};
+
+type UnionToIntersection<U> =
+    (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+
+// https://stackoverflow.com/questions/60862509/typescript-types-from-array-to-object
+// @ts-ignore
+export type StrapiModelMap<Models> = UnionToIntersection<ToObjectsArray<Models>[number]>;

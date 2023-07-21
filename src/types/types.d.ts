@@ -1,6 +1,3 @@
-import type { AxiosInstance } from "axios";
-
-
 /************************************************************************************
  *                                    Strapi Types                                  *
  *                    The basic properties all Strapi entities have.                *
@@ -144,7 +141,7 @@ type CreateTypeOptional<T> = Partial<Without<Omit<{
 type CreateType<T, A = CreateTypeRequired<T>, B = CreateTypeOptional<T>> = {
     [P in keyof A]: A[P] extends StrapiEntity ? number : A[P]
 } &
-{ [P in keyof B]?: B[P] extends StrapiEntity | undefined ? number : B[P] } &
+    { [P in keyof B]?: B[P] extends StrapiEntity | undefined ? number : B[P] } &
 { publishedAt?: Date };
 
 
