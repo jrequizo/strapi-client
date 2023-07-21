@@ -27,6 +27,9 @@ describe('StrapiModel', () => {
             baseURL: 'localhost',
             models: [restaurantsModel, reviewsModel]
         });
-        // client.api.restaurants.create({})
+
+        client.api.restaurants.create()
+        
+        client.api.reviews.addReview();
     });
 });

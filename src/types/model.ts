@@ -5,16 +5,16 @@ import type { AxiosInstance } from "axios";
 import StrapiModel from "../core/StrapiModel";
 
 
+
 /**
  * 
  */
 
 export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TOutput, TInput>;
 
-export type ModelExecutableFunction<TOutput, TInput = void> = TInput extends null ? () => Promise<TOutput> : (params: TInput) => Promise<TOutput>;
+export type ModelExecutableFunction<TOutput, TInput> = TInput extends { [key: string]: unknown } ? (params: TInput) => Promise<TOutput> : () => Promise<TOutput>;
 
 export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema, TPath> = {
-    // [key: string]: CustomRouteParam<TInput, TOutputSchema, TOutput>
     [K in keyof TPath]: ModelWrapperFunction<TOutput, TInput>
 }
 
@@ -27,7 +27,7 @@ export type AnyStrapiModel = Omit<typeof StrapiModel<any, any, any>, "prototype"
 type ToObject<Model> = Model extends StrapiModel<infer Endpoint, infer TZodSchema, ModelRecord<any, any, any, infer TPath>>
     ? {
         [E in keyof Endpoint]: {
-            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TOutput, infer TInput> ? ModelExecutableFunction<TOutput, TInput> : never
+            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<infer TInput, infer TOutput> ? ModelExecutableFunction<TOutput, TInput> : never
         }
     } : never;
 
