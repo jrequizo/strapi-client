@@ -13,24 +13,32 @@ class StrapiClient<
 
     constructor(params: {
         baseURL: string,
-        models: [...TModels],    // TODO
+        models: [...TModels],
     }) {
         // Initialize the client
         this.client = axios.create({
             baseURL: params.baseURL
         });
 
-        const api = params.models.reduce((previous, v,) => {
+        const api = params.models.reduce((accumulatedModels, v) => {
             const current = v as any;
+            // Transform the routes to their base functions
+
+            const routes = Object.keys(current.routes).reduce((accumulatedRoutes, currentRouteKey) => {
+                return {
+                    // Provide the client to each of the intermediate functions
+                    [currentRouteKey]: current.routes[currentRouteKey](this.client),
+                    ...accumulatedRoutes
+                }
+            }, {});
+
             return {
-                ...previous,
-                [current.endpoint]: current.routes
+                ...accumulatedModels,
+                [current.endpoint]: routes
             }
         }, {});
 
         this.api = api as any;
-
-        console.log(api);
 
         // this.models = params.models;
 

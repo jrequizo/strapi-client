@@ -2,7 +2,7 @@ import { AxiosInstance } from "axios";
 
 import { parseOutput } from "../util/parseOutput";
 
-import { DeleteType } from "../types/types";
+import { DeleteType } from "../types/crud";
 
 
 /**

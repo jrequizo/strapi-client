@@ -15,13 +15,18 @@ describe('StrapiModel', () => {
         const reviewsModel = new StrapiModel("reviews", {
             id: z.number(),
             rating: z.number()
+        }).createCustomRoutes("addReview", {
+            async handler() {
+                return {
+                    hello: "world!"
+                }
+            },
         });
 
         const client = new StrapiClient({
             baseURL: 'localhost',
             models: [restaurantsModel, reviewsModel]
         });
-
-        // client.api.restaurants.update();
+        // client.api.restaurants.create({})
     });
 });

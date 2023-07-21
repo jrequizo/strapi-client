@@ -2,7 +2,7 @@ import { AxiosInstance } from "axios";
 
 import { parseOutput } from "../util/parseOutput";
 
-import { UpdateType } from "../types/types";
+import { UpdateType } from "../types/crud";
 
 
 /**

@@ -8,7 +8,8 @@ import { findOne } from "../functions/findOne";
 import { update } from "../functions/update";
 import { remove } from "../functions/delete";
 
-import { AtLeastOneOf, CreateType, DeleteType, FindType, UpdateType } from "../types/types";
+import { CreateType, DeleteType, FindType, UpdateType } from "../types/crud";
+import { AtLeastOneOf } from "../types/core";
 
 
 /**

@@ -65,3 +65,22 @@ export {
  *      return restaurants;
  * }
  */
+
+import { z } from "zod";
+
+const restaurantsModel = new StrapiModel("restaurants", {
+    id: z.number(),
+    name: z.string()
+}).createDefaultRoutes();
+
+const reviewsModel = new StrapiModel("reviews", {
+    id: z.number(),
+    rating: z.number()
+});
+
+const client = new StrapiClient({
+    baseURL: 'localhost',
+    models: [restaurantsModel, reviewsModel]
+});
+
+console.log(client);

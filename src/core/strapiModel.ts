@@ -4,6 +4,8 @@ import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosResponse } from "axios";
 
 import { AnyModelRecord, CustomRouteParam, StrapiModelSchema } from "../types/model";
+import { AtLeastOneOf } from "../types/core";
+import { CreateType, FindType, UpdateType, DeleteType } from "../types/crud";
 
 
 class StrapiModel<
