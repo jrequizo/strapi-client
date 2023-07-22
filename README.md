@@ -1,3 +1,8 @@
+### A type-safe client library for Strapi
+
+The code is still very much a WIP while the core learning objective is to build a strong understanding of Typescript's type inference system.
+
+---
 Pattern:
 
 1. Define the API endpoints
@@ -7,19 +12,22 @@ Pattern:
 import { StrapiModel, StrapiType } from "strapi-client";
 
 // Here we are creating a binding to the `restaurant` collection.
-// We create the default handlers using `createDefaultRoutes`.
 const restaurantModel = StrapiModel("restaurant", {
      name: StrapiType.string(),
 })
+// We create the default handlers using `createDefaultRoutes`.
 .createDefaultRoutes()
 // We can create custom handlers for user-generated endpoints using `createCustomRoutes`.
+// The first parameter is the collection endpoint we are targeting.
 .createCustomRoutes("addReview", {
      // The required parameters to call this endpoint.
      // This is the data being sent to Strapi.
      params: z.object({
           rating: z.number()
      }),
-     // The handler for when we receive a response from our Strapi backend.
+     // This is the handler where we implement the calls to the Strapi API (or any other backend!).
+     // The function provides de-serializable functions that have been populated with the context
+     // for the API query (i.e. the baseURL + collection endpoint, TODO: add auth token ).
      // We can provide the type bindings for the data here.
      async handler({ input, post }) {
           // input: the values being provided to the API
@@ -62,7 +70,11 @@ export default client;
 import api from "@core/api/strapi"
 
 async function getRestaurants() {
+     // We now have full type-safety guarantees
      const restaurants = await api.restaurant.find();
+     // const restaurants: {
+     //   name: string;
+     // }[]
 
      return restaurants;
 }
