@@ -1,18 +1,3 @@
-
-**Strapi type definition:**
-
-
-Use this when defining the schema from the database.
-Use a 1-to-1 mapping of the types on the database.
-
-
-``````
-strapiClient default methods:
-Login:       POST: /api/auth/local
-Register:    POST: /api/auth/local/register
-``````
-
----
 Pattern:
 
 1. Define the API endpoints
@@ -69,6 +54,7 @@ const client = strapiClient({
 
 export default client;
 ```
+3. Use the API with full type-safety guarantees
 
 ```Typescript
 // ./pages/main.tsx
@@ -81,3 +67,16 @@ async function getRestaurants() {
      return restaurants;
 }
 ```
+---
+**Strapi type definition:**
+
+
+Use this when defining the schema from the database.
+Use a 1-to-1 mapping of the types on the database.
+
+
+``````
+strapiClient default methods:
+Login:       POST: /api/auth/local
+Register:    POST: /api/auth/local/register
+``````
