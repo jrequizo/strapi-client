@@ -16,6 +16,12 @@ const restaurantModel = StrapiModel("restaurant", {
      name: StrapiType.string(),
 })
 // We create the default handlers using `createDefaultRoutes`.
+// This will create the bindings for the following routes
+// - create
+// - find
+// - findOne
+// - update
+// - delete
 .createDefaultRoutes()
 // We can create custom handlers for user-generated endpoints using `createCustomRoutes`.
 // The first parameter is the collection endpoint we are targeting.
@@ -79,6 +85,15 @@ async function getRestaurants() {
      return restaurants;
 }
 ```
+---
+
+### TODO
+
+- [ ] Authentication contexts (local provider)
+- [ ] Error types
+- [ ] populate field expansion
+
+
 ---
 **Strapi type definition:**
 
