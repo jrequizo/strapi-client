@@ -12,9 +12,7 @@ import StrapiModel from "../core/StrapiModel";
 
 export type ModelWrapperFunction<TInput, TOutput> = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>;
 
-export type ModelExecutableFunction<TInput, TOutput> = TInput extends Object ?
-    (params: TInput) => Promise<TOutput>
-    : () => Promise<TOutput>;
+export type ModelExecutableFunction<TInput, TOutput> = undefined extends TInput ? (params?: TInput) => Promise<TOutput> : (params: TInput) => Promise<TOutput> 
 
 export type ModelRecord<TInput, TOutputSchema, TOutput extends TOutputSchema, TPath> = {
     [K in keyof TPath]: ModelWrapperFunction<TInput, TOutput>
@@ -43,9 +41,9 @@ export type AnyStrapiModel = Omit<typeof StrapiModel<any, any, any>, "prototype"
 export type TransformPathToKey<Model> = Model extends StrapiModel<infer Endpoint, infer TZodSchema, ModelRecord<any, any, any, infer TPath>>
     ? {
         [E in keyof Endpoint]: {
-            [P in keyof TPath]: Model["routes"][P] extends ModelWrapperFunction<any, any> ? ReturnType<Model["routes"][P]> : never
+            [P in keyof TPath]: ReturnType<Model["routes"][P]>
         }
-    } : never;
+    } : "D";
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 

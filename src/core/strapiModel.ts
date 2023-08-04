@@ -1,10 +1,9 @@
-import { z, ZodSchema } from "zod";
+import { z, ZodOptional, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
-import { AnyModelRecord, ModelExecutableFunction, StrapiModelSchema } from "../types/model";
-import { AtLeastOneOf } from "../types/util";
+import { AnyModelRecord, ModelWrapperFunction, StrapiModelSchema } from "../types/model";
 import { CreateType, UpdateType, DeleteType, FindType } from "../types/crud";
 
 
@@ -12,8 +11,8 @@ import { CreateType, UpdateType, DeleteType, FindType } from "../types/crud";
  * Defines the properties required for creating a custom rout in a `StrapiModel`.
  * @internal
  */
-type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
-    params?: ZodSchema<TInput>,
+type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema, TZodSchema = ZodSchema<TInput>> = {
+    params?: TZodSchema,
     response?: ZodSchema<TOutputSchema>
     handler: (props: {
         client: AxiosInstance,
@@ -109,7 +108,7 @@ class StrapiModel<
         TOutputSchema,
         TOutput extends TOutputSchema,
         TInput,
-        TExecutable = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>,
+        TExecutable = ModelWrapperFunction<TInput, TOutput>,
     >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
         TEndpoint,
         InputZodSchema,

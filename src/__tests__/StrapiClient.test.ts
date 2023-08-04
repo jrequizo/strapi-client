@@ -44,6 +44,6 @@ describe('StrapiModel', () => {
             name: "asdf"
         })
         
-        client.api.reviews.addReview()
+        client.api.reviews.addReview();
     });
 });
