@@ -1,14 +1,12 @@
 import axios, { AxiosInstance } from "axios";
 
-import { AnyStrapiModel, StrapiModelMap } from "../types/model";
+import { AnyStrapiModel, StrapiModelMap, TransformPathToKey, UnionToIntersection } from "../types/model";
 
 class StrapiClient<
     TModels extends AnyStrapiModel[],
-    API extends StrapiModelMap<TModels>
+    API extends UnionToIntersection<TransformPathToKey<[...TModels][number]>>
 > {
     client: AxiosInstance;
-
-    // models: [...TModels];
     api: API;
 
     constructor(params: {
@@ -39,10 +37,6 @@ class StrapiClient<
         }, {});
 
         this.api = api as any;
-
-        // this.models = params.models;
-
-        // Transform the models into their respective endpoints
 
     }
 

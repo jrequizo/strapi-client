@@ -2,7 +2,7 @@
  *                                 Helper Types                                     *
  ***********************************************************************************/
 
-import { NonNullRequired, Without, AtLeastOneOf } from "./core"
+import { NonNullRequired, Without, AtLeastOneOf } from "./util"
 import { StrapiEntity, NonStrapi } from "./strapi"
 
 

@@ -29,11 +29,15 @@ describe('StrapiModel', () => {
         })
         .createDefaultRoutes();
 
-        const createRestaurant = model.routes.create(axios.create());
+        const create = model.routes.create(axios.create());
 
-        const restaurant = await createRestaurant({
-            name: "McDuffies"
-        });
+        const result = create();
+
+        // const createRestaurant = model.routes.create(axios.create());
+
+        // const restaurant = await createRestaurant({
+        //     name: "McDuffies"
+        // });
     });
 
 
