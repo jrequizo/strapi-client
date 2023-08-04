@@ -94,11 +94,11 @@ export type CreateType<T, A = CreateTypeRequired<T>, B = CreateTypeOptional<T>> 
 { publishedAt?: Date };
 
 
-export type FindType<IFind> = {
+export type FindType<IFind> = AtLeastOneOf<{
     filters?: WhereCondition<Omit<IFind, "createdAt" | "UpdatedAt">>,
     populate?: PopulateCondition<Omit<IFind, "createdAt" | "UpdatedAt">>,
     publicationState?: "live" | "preview"
-};
+}>;
 
 export type UpdateType<IUpdate> = { id: number, update: UpdateParams<NonStrapi<IUpdate>> };
 

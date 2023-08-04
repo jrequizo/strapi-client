@@ -30,7 +30,10 @@ describe('StrapiModel', () => {
             models: [restaurantsModel, reviewsModel]
         });
 
-        client.api.restaurants.find();
+        // TODO: fix `AtLeastOneOf` for find params
+        client.api.restaurants.find({
+           populate: "*" 
+        });
 
         client.api.restaurants.update({
             id: 0,
