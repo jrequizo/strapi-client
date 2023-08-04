@@ -1,19 +1,18 @@
-import { z, ZodSchema } from "zod";
+import { z, ZodOptional, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
-import { AnyModelRecord, ModelExecutableFunction, StrapiModelSchema } from "../types/model";
-import { AtLeastOneOf } from "../types/core";
-import { CreateType, FindType, UpdateType, DeleteType } from "../types/crud";
+import { AnyModelRecord, ModelWrapperFunction, StrapiModelSchema } from "../types/model";
+import { CreateType, UpdateType, DeleteType, FindType } from "../types/crud";
 
 
 /**
  * Defines the properties required for creating a custom rout in a `StrapiModel`.
  * @internal
  */
-type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema> = {
-    params?: ZodSchema<TInput>,
+type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema, TZodSchema = ZodSchema<TInput>> = {
+    params?: TZodSchema,
     response?: ZodSchema<TOutputSchema>
     handler: (props: {
         client: AxiosInstance,
@@ -71,9 +70,9 @@ class StrapiModel<
         TEndpoint,
         InputZodSchema,
         ThisRouterRecord & {
-            create: (client: AxiosInstance) => (params?: CreateType<Schema> | undefined) => Promise<Schema | AxiosResponse<any, any>>,
-            find: (client: AxiosInstance) => (params?: AtLeastOneOf<FindType<Schema>> | undefined) => Promise<AxiosResponse<any, any> | Schema[]>,
-            findOne: (client: AxiosInstance) => (params?: AtLeastOneOf<FindType<Schema>> | undefined) => Promise<AxiosResponse<any, any> | Schema[]>,
+            create: (client: AxiosInstance) => (params?: CreateType<Schema>) => Promise<Schema | AxiosResponse<any, any>>,
+            find: (client: AxiosInstance) => (params?: FindType<Schema>) => Promise<AxiosResponse<any, any> | Schema[]>,
+            findOne: (client: AxiosInstance) => (params?: FindType<Schema>) => Promise<AxiosResponse<any, any> | Schema[]>,
             update: (client: AxiosInstance) => (params: UpdateType<Schema>) => Promise<Schema | AxiosResponse<any, any>>,
             delete: (client: AxiosInstance) => (params: DeleteType) => Promise<Schema | AxiosResponse<any, any>>
         },
@@ -108,8 +107,8 @@ class StrapiModel<
         TPath,
         TOutputSchema,
         TOutput extends TOutputSchema,
-        TInput = null,
-        TExecutable = (client: AxiosInstance) => ModelExecutableFunction<TInput, TOutput>,
+        TInput,
+        TExecutable = ModelWrapperFunction<TInput, TOutput>,
     >(path: string & keyof TPath, params: CustomRouteParam<TInput, TOutputSchema, TOutput>): StrapiModel<
         TEndpoint,
         InputZodSchema,
@@ -117,6 +116,7 @@ class StrapiModel<
         Schema
     > {
         if (Object.keys(this.routes).find(key => key === path)) {
+            // TODO: proper error management
             throw Error("Duplicate keys");
         }
 

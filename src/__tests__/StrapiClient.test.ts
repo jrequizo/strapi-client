@@ -6,9 +6,8 @@ describe('StrapiModel', () => {
     /**
      * 
      */
-    test('Create a StrapiClient', () => {
+    test('Create a StrapiClient', async () => {
         const restaurantsModel = new StrapiModel("restaurants", {
-            id: z.number(),
             name: z.string()
         }).createDefaultRoutes();
 
@@ -16,11 +15,14 @@ describe('StrapiModel', () => {
             id: z.number(),
             rating: z.number()
         }).createCustomRoutes("addReview", {
+            params: z.optional(z.object({
+                id: z.number(),
+            })),
             async handler() {
                 return {
                     hello: "world!"
                 }
-            },
+            }
         });
 
         const client = new StrapiClient({
@@ -28,7 +30,22 @@ describe('StrapiModel', () => {
             models: [restaurantsModel, reviewsModel]
         });
 
-        client.api.restaurants.create()
+        // TODO: fix `AtLeastOneOf` for find params
+        client.api.restaurants.find({
+           populate: "*" 
+        });
+
+        client.api.restaurants.update({
+            id: 0,
+            update: {
+                name: "asdf"
+                
+            }
+        }) 
+
+        client.api.restaurants.create({
+            name: "asdf"
+        })
         
         client.api.reviews.addReview();
     });

@@ -9,7 +9,6 @@ import { update } from "../functions/update";
 import { remove } from "../functions/delete";
 
 import { CreateType, DeleteType, FindType, UpdateType } from "../types/crud";
-import { AtLeastOneOf } from "../types/core";
 
 
 /**
@@ -36,13 +35,13 @@ export function createDefaultMethods<
         },
 
         findBase(client: AxiosInstance) {
-            return async (params?: AtLeastOneOf<FindInput>) => {
+            return async (params?: FindInput) => {
                 return await find<FindInput, TSchema>(client, routerPath, params);
             }
         },
 
         findOneBase(client: AxiosInstance) {
-            return async (params?: AtLeastOneOf<FindInput>) => {
+            return async (params?: FindInput) => {
                 return await findOne<FindInput, TSchema>(client, routerPath, params);
             }
         },
