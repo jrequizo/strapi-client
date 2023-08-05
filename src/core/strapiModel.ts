@@ -1,4 +1,4 @@
-import { z, ZodOptional, ZodSchema } from "zod";
+import { z, ZodSchema } from "zod";
 
 import { createDefaultMethods } from "./createDefaultMethods";
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
@@ -27,6 +27,10 @@ type CustomRouteParam<TInput, TOutputSchema, TOutput extends TOutputSchema, TZod
 }
 
 
+/**
+ * Creates a model to represent a Strapi collection.
+ * Methods can be added to this model that represent the endpoints available to that route.
+ */
 class StrapiModel<
     TEndpoint,
     InputZodSchema extends StrapiModelSchema<any>,
@@ -54,7 +58,7 @@ class StrapiModel<
      * Check to avoid duplication of default routes
      * @internal
      */
-    _hasDefaultRoutes = false;
+    private _hasDefaultRoutes = false;
 
     constructor(endpoint: string & keyof TEndpoint, schema: InputZodSchema) {
         this.endpoint = endpoint;

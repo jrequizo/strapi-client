@@ -91,11 +91,12 @@ async function getRestaurants() {
 
 - [ ] Authentication contexts (local provider)
 - [ ] Error types
-- [ ] populate field expansion
+- [ ] Populate field expansion
+- [ ] Status code dependent typing for result
 
 
 ---
-**Strapi type definition:**
+**WIP: Strapi type definition:**
 
 
 Use this when defining the schema from the database.

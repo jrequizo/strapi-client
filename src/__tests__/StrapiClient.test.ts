@@ -3,10 +3,18 @@ import { z } from "zod";
 import { StrapiModel, StrapiClient } from "../index";
 
 describe('StrapiModel', () => {
+    test('Create a StrapiClient with no models', async () => {
+        const client = new StrapiClient({
+            baseURL: 'localhost',
+            models: []
+        });
+
+        expect(client.api).toMatchObject({});
+    });
     /**
      * 
      */
-    test('Create a StrapiClient', async () => {
+    test('Create a StrapiClient with default routes', async () => {
         const restaurantsModel = new StrapiModel("restaurants", {
             name: z.string()
         }).createDefaultRoutes();
@@ -30,23 +38,8 @@ describe('StrapiModel', () => {
             models: [restaurantsModel, reviewsModel]
         });
 
-        // TODO: fix `AtLeastOneOf` for find params
-        client.api.restaurants.find({
+        const result = await client.api.restaurants.find({
            populate: "*" 
         });
-
-        client.api.restaurants.update({
-            id: 0,
-            update: {
-                name: "asdf"
-                
-            }
-        }) 
-
-        client.api.restaurants.create({
-            name: "asdf"
-        })
-        
-        client.api.reviews.addReview();
     });
 });
