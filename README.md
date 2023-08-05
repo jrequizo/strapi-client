@@ -96,7 +96,7 @@ async function getRestaurants() {
 
 
 ---
-**Strapi type definition:**
+**WIP: Strapi type definition:**
 
 
 Use this when defining the schema from the database.
