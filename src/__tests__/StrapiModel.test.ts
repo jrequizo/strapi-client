@@ -2,8 +2,6 @@ import { z } from "zod";
 
 import { StrapiModel } from "../index";
 
-import axios from "axios";
-
 describe('StrapiModel', () => {
     /**
      * 

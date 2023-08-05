@@ -1,4 +1,4 @@
-import { ZodSchema, z } from "zod";
+import { ZodSchema } from "zod";
 
 import type { AxiosInstance } from "axios";
 
