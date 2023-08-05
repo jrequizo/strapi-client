@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from "axios";
 
-import { AnyStrapiModel, StrapiModelMap, TransformPathToKey, UnionToIntersection } from "../types/model";
+import { AnyStrapiModel, TransformPathToKey, UnionToIntersection } from "../types/model";
 
 class StrapiClient<
     TModels extends AnyStrapiModel[],
     API extends UnionToIntersection<TransformPathToKey<[...TModels][number]>>
 > {
-    client: AxiosInstance;
+    axios: AxiosInstance;
     api: API;
 
     constructor(params: {
@@ -14,7 +14,7 @@ class StrapiClient<
         models: [...TModels],
     }) {
         // Initialize the client
-        this.client = axios.create({
+        this.axios = axios.create({
             baseURL: params.baseURL
         });
 
@@ -25,7 +25,7 @@ class StrapiClient<
             const routes = Object.keys(current.routes).reduce((accumulatedRoutes, currentRouteKey) => {
                 return {
                     // Provide the client to each of the intermediate functions
-                    [currentRouteKey]: current.routes[currentRouteKey](this.client),
+                    [currentRouteKey]: current.routes[currentRouteKey](this.axios),
                     ...accumulatedRoutes
                 }
             }, {});

@@ -54,7 +54,7 @@ class StrapiModel<
      * Check to avoid duplication of default routes
      * @internal
      */
-    _hasDefaultRoutes = false;
+    private _hasDefaultRoutes = false;
 
     constructor(endpoint: string & keyof TEndpoint, schema: InputZodSchema) {
         this.endpoint = endpoint;
