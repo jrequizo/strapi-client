@@ -15,7 +15,7 @@ describe('StrapiModel', () => {
         });
 
         // TODO: expect model to have no routes
-        expect(model.routes.restaurants).toBeDefined()
+        expect(model.routes.restaurants).toBeDefined();
     });
 
 
@@ -29,15 +29,11 @@ describe('StrapiModel', () => {
         })
         .createDefaultRoutes();
 
-        const create = model.routes.create(axios.create());
-
-        const result = create();
-
-        // const createRestaurant = model.routes.create(axios.create());
-
-        // const restaurant = await createRestaurant({
-        //     name: "McDuffies"
-        // });
+        expect(model.routes.create).toBeDefined();
+        expect(model.routes.delete).toBeDefined();
+        expect(model.routes.find).toBeDefined();
+        expect(model.routes.findOne).toBeDefined();
+        expect(model.routes.update).toBeDefined();
     });
 
 
@@ -64,11 +60,7 @@ describe('StrapiModel', () => {
                 };
             },
         });
-
-        const addReview = model.routes.addReview(axios.create());
-
-        const result = await addReview({
-            name: "John Smith"
-        });
+        
+        expect(model.routes.addReview).toBeDefined();
     });
 });

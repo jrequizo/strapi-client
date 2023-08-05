@@ -91,7 +91,8 @@ async function getRestaurants() {
 
 - [ ] Authentication contexts (local provider)
 - [ ] Error types
-- [ ] populate field expansion
+- [ ] Populate field expansion
+- [ ] Status code dependent typing for result
 
 
 ---
